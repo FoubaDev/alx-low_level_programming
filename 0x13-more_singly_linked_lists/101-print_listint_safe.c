@@ -1,53 +1,55 @@
-#include <stdlib.h>
 #include "lists.h"
+#include <stdio.h>
 
 /**
- * free_listint_safe - Free a list that may or may not loop,
- * set start of list to NULL
- * @h: Pointer to pointer to the start of the list
- * Return: Size of the list that has been freed
+ * print_listint_safe - function that prints a listint_t linked list.
+ * @head: pointer to head of a list.
+ *
+ * Return: Length of list (INT)
  */
-size_t free_listint_safe(listint_t **h)
+size_t print_listint_safe(const listint_t *head)
 {
-	listint_t *killnode;
-	listint_t *current;
-	listadd_t *headadd;
-	listadd_t *checker;
-	size_t count;
+	const listint_t *slow_p = head ,*fast_p = head;
+	size_t ele = 0;
+	int is_loop = 0;
 
-	count = 0;
-	current = *h;
-	headadd = NULL;
-	if (h != NULL)
+	while (slow_p && fast_p && fast_p->next)
 	{
-		while (current != NULL)
+		if (!(fast_p->next->next))
+			break;
+		slow_p = slow_p->next;
+		fast_p = fast_p->next->next;
+		if (slow_p == fast_p)
 		{
-			checker = headadd;
-			while (checker != NULL)
-			{
-				if (current == checker->address)
-				{
-					free(current);
-					free_listadd(headadd);
-					/*headadd = NULL;*/
-					 *h = NULL;
-					return (count);
-				}
-				checker = checker->next;
-			}
-			killnode = current;
-			if (add_nodeaddress(&headadd, current) == NULL)
-			{
-				free_listadd(headadd);
-				exit(98);
-			}
-			current = current->next;
-			free(killnode);
-			count++;
+			slow_p = slow_p->next;
+			is_loop = 1;
+			break;
 		}
-		free_listadd(headadd);
-		/*headadd = NULL;*/
-		*h = NULL;
 	}
-	return (count);
+
+	if (!is_loop)
+	{
+		while (head)
+		{
+			ele++;
+			printf("[%p] %d\n", (void *)head, head->n);
+			head = head->next;
+		}
+		return (ele);
+	}
+
+	while (head)
+	{
+		ele++;
+		if (head == slow_p)
+		{
+			printf("[%p] %d\n", (void *)head, head->n);
+			printf("-> [%p] %d\n", (void *)head, head->next->n);
+			exit(98);
+		}
+
+		printf("[%p] %d\n", (void *)head, head->n);
+		head = head->next;
+	}
+	return (0);
 }
