@@ -1,38 +1,46 @@
-#include "main.h"
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdlib.h>
 
 /**
- * create_file - creates a file
- * @filename: filename.
- * @text_content: content writed in the file.
+ * read_textfile - prints text from a file
  *
- * Return: 1 if it success. -1 if it fails.
+ * @filename: name of the file
+ * @letters: number of characters to read
+ *
+ * Return: actual number of letters read, 0 if end of file
  */
-int create_file(const char *filename, char *text_content)
+ssize_t read_textfile(const char *filename, size_t letters)
 {
-	int fd;
-	int nletters;
-	int rwr;
+	int file;
+	int length, wrotechars;
+	char *buf;
 
-	if (!filename)
-		return (-1);
+	if (filename == NULL || letters == 0)
+		return (0);
+	buf = malloc(sizeof(char) * (letters));
+	if (buf == NULL)
+		return (0);
 
-	fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0600);
+	file = open(filename, O_RDONLY);
+	if (file == -1)
+	{
+		free(buf);
+		return (0);
+	}
+	length = read(file, buf, letters);
+	if (length == -1)
+	{
+		free(buf);
+		close(file);
+		return (0);
+	}
 
-	if (fd == -1)
-		return (-1);
+	wrotechars = write(STDOUT_FILENO, buf, length);
 
-	if (!text_content)
-		text_content = "";
-
-	for (nletters = 0; text_content[nletters]; nletters++)
-		;
-
-	rwr = write(fd, text_content, nletters);
-
-	if (rwr == -1)
-		return (-1);
-
-	close(fd);
-
-	return (1);
+	free(buf);
+	close(file);
+	if (wrotechars != length)
+		return (0);
+	return (length);
 }
