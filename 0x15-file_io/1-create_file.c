@@ -1,7 +1,7 @@
 #include "main.h"
 
 /**
- * _strlen - finds size of null-terminated string
+ * _strlen - finds  size of null-terminated string
  * @s: string
  *
  * Return: length of string
