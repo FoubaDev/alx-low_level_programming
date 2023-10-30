@@ -3,11 +3,11 @@
 #include "main.h"
 
 /**
- * read_textfile - that reads a text file and prints
- * @filename: variable pointer
- * @letters: size letters
- * Description: Write a function that reads a text file and prints it
- * Return: the actual number of letters it could read and print, 0 otherwise
+ * read_textfile - reads a text file and prints it to std output
+ * @filename: file to read and print
+ * @letters: number of letters it should read and print
+ 
+ * Return: actual number of letter read and printed
  */
 
 ssize_t read_textfile(const char *filename, size_t letters)
@@ -30,11 +30,27 @@ ssize_t read_textfile(const char *filename, size_t letters)
 		return (0);
 	}
 
-	let = read(file, text, letters);
+	read_actual = read(fd, buffer, letters);
+	if (read_actual == -1)
+	{
+		free(buffer);
+		return (0);
+	}
 
-	w = write(STDOUT_FILENO, text, let);
+	close_check = close(fd);
+	if (close_check == -1)
+	{
+		free(buffer);
+		return (0);
+	}
 
-	close(file);
+	write_actual = write(STDOUT_FILENO, buffer, read_actual);
+	if (write_actual == -1 || write_actual != read_actual)
+	{
+		free(buffer);
+		return (0);
+	}
 
-	return (w);
+	free(buffer);
+	return (write_actual);
 }
