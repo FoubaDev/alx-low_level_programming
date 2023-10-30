@@ -1,55 +1,50 @@
 #include "main.h"
 
 /**
- * _strlen - finds  size of null-terminated string
- * @s: string
+ * _strlen - compute the length of a NULL-terminated string
+ * @str: the string to measure
  *
- * Return: length of string
+ * Return: the length of str, or -1 if str is NULL
  */
-
-size_t _strlen(char *s)
+ssize_t _strlen(const char *str)
 {
-	size_t i = 0;
+	ssize_t len = 0;
 
-	while (s[i] != '\0')
-		i++;
+	if (!str)
+		return (-1);
 
-	return (i);
+	while (*str++)
+		++len;
+
+	return (len);
 }
 
 /**
- * create_file - creates a file
- * @filename: file's name to create
- * @text_content: text to add to file as contents
+ * create_file - create a file
+ * @filename: the name of the file to create
+ * @text_content: the data to write to filename
  *
- * Return: 1 on success, -1 on failure
+ * Return: Upon success, return 1. Otherwise, return -1.
  */
-
 int create_file(const char *filename, char *text_content)
 {
-	int fd, close_check;
-	size_t length;
-	ssize_t write_actual;
+	ssize_t b_written = 0;
+	int fd;
 
-	if (filename == NULL)
+	if (!filename)
 		return (-1);
 
 	fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
-	if (fd == -1)
+
+	if (fd < 0)
 		return (-1);
 
-	if (text_content == NULL)
-		return (1);
+	if (text_content)
+		b_written = write(fd, text_content, _strlen(text_content));
 
-	length = _strlen(text_content);
+	close(fd);
 
-	write_actual = write(fd, text_content, length);
-	if (write_actual == -1)
+	if (b_written < 0)
 		return (-1);
-
-	close_check = close(fd);
-	if (close_check == -1)
-		return (-1);
-
 	return (1);
 }
