@@ -1,56 +1,48 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "main.h"
 
 /**
- * read_textfile - reads a text file and prints it to std output
- * @filename: file to read and print
- * @letters: number of letters it should read and print
- 
- * Return: actual number of letter read and printed
+ * read_textfile - read a text file and print it to stdout
+ * @filename: the name of the file to read
+ * @letters: the number of letters to be read and printed
+ *
+ * Return: If filename is NULL, the file cannot be opened or read, or
+ * write fails or returns an unexpected number of bytes, return 0.
+ * Otherwise, return the actual number of letters read and printed.
  */
-
 ssize_t read_textfile(const char *filename, size_t letters)
 {
-	ssize_t file, let, w;
-	char *text;
+	char *buffer = NULL;
+	ssize_t b_read;
+	ssize_t b_written;
+	int fd;
 
-	text = malloc(letters);
-	if (text == NULL)
+	if (!(filename && letters))
 		return (0);
 
-	if (filename == NULL)
+	fd = open(filename, O_RDONLY);
+	if (fd == -1)
 		return (0);
 
-	file = open(filename, O_RDONLY);
-
-	if (file == -1)
-	{
-		free(text);
+	buffer = malloc(sizeof(char) * letters);
+	if (!buffer)
 		return (0);
-	}
 
-	read_actual = read(fd, buffer, letters);
-	if (read_actual == -1)
-	{
-		free(buffer);
-		return (0);
-	}
+	b_read = read(fd, buffer, letters);
+	close(fd);
 
-	close_check = close(fd);
-	if (close_check == -1)
+	if (b_read < 0)
 	{
 		free(buffer);
 		return (0);
 	}
+	if (!b_read)
+		b_read = letters;
 
-	write_actual = write(STDOUT_FILENO, buffer, read_actual);
-	if (write_actual == -1 || write_actual != read_actual)
-	{
-		free(buffer);
-		return (0);
-	}
-
+	b_written = write(STDOUT_FILENO, buffer, b_read);
 	free(buffer);
-	return (write_actual);
+
+	if (b_written < 0)
+		return (0);
+
+	return (b_written);
 }
