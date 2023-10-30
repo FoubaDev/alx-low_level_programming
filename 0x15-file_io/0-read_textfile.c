@@ -1,43 +1,38 @@
 #include "main.h"
 
 /**
- * read_textfile- reads a text file and prints the letters
- * @filename: filename.
- * @letters: numbers of letters printed.
+ * read_textfile - Function that reads a text file and prints it to the POSIX
+ * standard output
  *
- * Return: numbers of letters printed. It fails,returns 0.
+ * @filename: Name of the file to be red
+ * @letters: Number of letters the function should read and print
+ *
+ * Return: Actual number of letters red and printed (Success), 0 (Failure)
  */
 ssize_t read_textfile(const char *filename, size_t letters)
 {
-	int file;
-	int length, wrotechars;
-	char *buf;
+	ssize_t file, rfile, wfile;
+	char *buffer;
 
-	if (filename == NULL || letters == 0)
+	if (filename == NULL)
 		return (0);
-	buf = malloc(sizeof(char) * (letters));
-	if (buf == NULL)
+
+	buffer = malloc(sizeof(char) * letters);
+	if (buffer == NULL)
 		return (0);
 
 	file = open(filename, O_RDONLY);
-	if (file == -1)
+	rfile = read(file, buffer, letters);
+	wfile = write(STDOUT_FILENO, buffer, rfile);
+
+	if (file == -1 || rfile == -1 || wfile != rfile)
 	{
-		free(buf);
-		return (0);
-	}
-	length = read(file, buf, letters);
-	if (length == -1)
-	{
-		free(buf);
-		close(file);
+		free(buffer);
 		return (0);
 	}
 
-	wrotechars = write(STDOUT_FILENO, buf, length);
-
-	free(buf);
+	free(buffer);
 	close(file);
-	if (wrotechars != length)
-		return (0);
-	return (length);
+
+	return (wfile);
 }
