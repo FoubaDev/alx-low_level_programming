@@ -1,38 +1,46 @@
-#include "main.h"
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdlib.h>
 
 /**
- * read_textfile - Function that reads a text file and return it to the POSIX
- * standard output
+ * read_textfile - prints text from a file
  *
- * @filename: Name of the file to be red
- * @letters: Number of letters the function should read and print
+ * @filename: name of the file
+ * @letters: number of characters to read
  *
- * Return: Actual number of letters red and printed (Success), 0 (Failure)
+ * Return: actual number of letters read, 0 if end file
  */
 ssize_t read_textfile(const char *filename, size_t letters)
 {
-	ssize_t file, rfile, wfile;
-	char *buffer;
+	int file;
+	int length, wrotechars;
+	char *buf;
 
-	if (filename == NULL)
+	if (filename == NULL || letters == 0)
 		return (0);
-
-	buffer = malloc(sizeof(char) * letters);
-	if (buffer == NULL)
+	buf = malloc(sizeof(char) * (letters));
+	if (buf == NULL)
 		return (0);
 
 	file = open(filename, O_RDONLY);
-	rfile = read(file, buffer, letters);
-	wfile = write(STDOUT_FILENO, buffer, rfile);
-
-	if (file == -1 || rfile == -1 || wfile != rfile)
+	if (file == -1)
 	{
-		free(buffer);
+		free(buf);
+		return (0);
+	}
+	length = read(file, buf, letters);
+	if (length == -1)
+	{
+		free(buf);
+		close(file);
 		return (0);
 	}
 
-	free(buffer);
-	close(file);
+	wrotechars = write(STDOUT_FILENO, buf, length);
 
-	return (wfile);
+	free(buf);
+	close(file);
+	if (wrotechars != length)
+		return (0);
+	return (length);
 }
