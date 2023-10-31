@@ -1,7 +1,7 @@
 #include "main.h"
 
 /**
- * read_textfile - Function that reads a text file and prints it to the POSIX
+ * read_textfile - Function that reads a text file and return it to the POSIX
  * standard output
  *
  * @filename: Name of the file to be red
